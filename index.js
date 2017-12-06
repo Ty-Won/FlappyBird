@@ -2,10 +2,18 @@ var flappyBird;
 var pillars = [];
 
 function startGame() {
-    flappyBird = new component(30, 30, "red", 100, window.innerHeight / 2);
+    var gamebox=document.getElementsByName("canvas");
+
+    flappyBird = new component(30, 30, "red", 250, window.innerHeight / 2);
     myScore = new component("30px", "Consolas", "black", 280, 40, "text");
     myGameArea.start();
-    console.log(window.innerHeight);
+    gamebox.addEventListener("keydown", function(e){
+        if(e.keyCode=="ArrowUp"){
+            accelerate(5)
+        }
+
+    });
+    gamebox.addEventListener("keyup", accelerate(5))
 }
 
 var myGameArea = {
@@ -59,6 +67,7 @@ function updateGameArea() {
 
 
     myGameArea.clear();
+
     myGameArea.frameNo += 1;
     if (myGameArea.frameNo == 1 || everyInterval(150)) {
         x = myGameArea.canvas.width;
@@ -78,8 +87,9 @@ function updateGameArea() {
         pillars[i].update();
     }
 
-    flappyBird.speedX = -0.25;
+    flappyBird.speedX = 0;
     flappyBird.speedY = 0;
+    flappyBird.gravity=3;
     if (myGameArea.keys && myGameArea.keys[37]) {
         flappyBird.speedX = -1;
     }
@@ -87,11 +97,10 @@ function updateGameArea() {
         flappyBird.speedX = 1;
     }
     if (myGameArea.keys && myGameArea.keys[38]) {
-        flappyBird.speedY = -1;
+        flappyBird.gravity = -15;
     }
-    if (myGameArea.keys && myGameArea.keys[40]) {
-        flappyBird.speedY = 1;
-    }
+
+
     myScore.text="Score:" + myGameArea.frameNo;
     myScore.update();
     flappyBird.newPos();
@@ -106,12 +115,13 @@ function component(width, height, color, x, y, type) {
     this.y = y;
     this.speedX = 0;
     this.speedY = 0;
+    this.gravity=0;
     this.type=type;
     this.update = function () {
         ctx = myGameArea.context;
         if (this.type == "text"){
             ctx.font = this.width + " " + this.height;
-            ctx.fillStyle = "blue";
+            ctx.fillStyle = "white";
             ctx.fillText(this.text, this.x, this.y);
 
         }
@@ -123,7 +133,7 @@ function component(width, height, color, x, y, type) {
         }};
     this.newPos = function () {
         this.x += this.speedX;
-        this.y += this.speedY;
+        this.y += this.speedY+this.gravity;
     };
     this.crashWith = function (otherobj) {
         var objLeft = this.x;
@@ -150,6 +160,10 @@ function component(width, height, color, x, y, type) {
 
 function everyInterval(n) {
     return ((myGameArea.frameNo / n) % 1 === 0);
+}
+
+function accelerate(n){
+    flappyBird.gravity=n;
 }
 
 
