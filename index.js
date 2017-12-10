@@ -1,19 +1,15 @@
 var flappyBird;
+var myScore;
 var pillars = [];
+var flapAudio = new Audio('Sounds/sfx_swooshing.wav');
+var hit = new Audio ('Sounds/sfx_hit.wav');
+var gameOverAud = new Audio('Sounds/sfx_die.wav');
+
 
 function startGame() {
-    var gamebox=document.getElementsByName("canvas");
-
-    flappyBird = new component(30, 30, "red", 250, window.innerHeight / 2);
+    flappyBird = new component(60, 40, "Flappy_Bird.png", 250, window.innerHeight / 2, "img");
     myScore = new component("30px", "Consolas", "black", 280, 40, "text");
     myGameArea.start();
-    gamebox.addEventListener("keydown", function(e){
-        if(e.keyCode=="ArrowUp"){
-            accelerate(5)
-        }
-
-    });
-    gamebox.addEventListener("keyup", accelerate(5))
 }
 
 var myGameArea = {
@@ -47,17 +43,14 @@ function updateGameArea() {
     var x, y;
 
     for (i = 0; i < pillars.length; i++) {
-        if (flappyBird.crashWith(pillars[i])) {
+        if (flappyBird.crashWith(pillars[i]) || flappyBird.x <0 || flappyBird.y > window.innerHeight) {
             myGameArea.stop();
+            hit.play();
+            gameOverAud.play();
             alert("GAME OVER");
-            return;
 
         }
-        else if (flappyBird.x <0 || flappyBird.y > window.innerHeight){
-            myGameArea.stop();
-            alert("GAME OVER");
-            return;
-        }
+
         else if(pillars[0].x<0 ){
             pillars.shift();
 
@@ -74,12 +67,12 @@ function updateGameArea() {
         minHeight=0;
         maxHeight = 200;
         height= Math.floor(Math.random()*(maxHeight-minHeight+1)+minHeight);
-        minGap = 50;
+        minGap = 75;
         maxGap=200;
         gap = Math.floor(Math.random()*(maxGap-minGap)+minGap);
         y = myGameArea.canvas.height - 200;
-        pillars.push(new component(10, height, "green", x, 0));
-        pillars.push(new component(10, x-height-gap, "green", x, height+gap));
+        pillars.push(new component(50, height, "pipeDown.png", x, 0,"img"));
+        pillars.push(new component(50, x-height-gap, "pipeDown.png", x, height+gap,"img"));
     }
 
     for (i = 0; i < pillars.length; i += 1) {
@@ -90,17 +83,12 @@ function updateGameArea() {
     flappyBird.speedX = 0;
     flappyBird.speedY = 0;
     flappyBird.gravity=3;
-    if (myGameArea.keys && myGameArea.keys[37]) {
-        flappyBird.speedX = -1;
-    }
-    if (myGameArea.keys && myGameArea.keys[39]) {
-        flappyBird.speedX = 1;
-    }
+
     if (myGameArea.keys && myGameArea.keys[38]) {
         flappyBird.gravity = -15;
+        flapAudio.play();
+        flapAudio.currentTime=0;
     }
-
-
     myScore.text="Score:" + myGameArea.frameNo;
     myScore.update();
     flappyBird.newPos();
@@ -108,7 +96,7 @@ function updateGameArea() {
 
 }
 
-function component(width, height, color, x, y, type) {
+function component(width, height, fill, x, y, type) {
     this.width = width;
     this.height = height;
     this.x = x;
@@ -117,17 +105,28 @@ function component(width, height, color, x, y, type) {
     this.speedY = 0;
     this.gravity=0;
     this.type=type;
+    if(this.type === "img"){
+        this.image = new Image();
+        this.image.src = fill;
+
+    }
+
     this.update = function () {
         ctx = myGameArea.context;
-        if (this.type == "text"){
+        if (this.type === "text"){
             ctx.font = this.width + " " + this.height;
             ctx.fillStyle = "white";
             ctx.fillText(this.text, this.x, this.y);
 
         }
+        else if(this.type === "img"){
+            ctx.drawImage(this.image, this.x,this.y,this.width,this.height);
+
+
+        }
         else
         {
-            ctx.fillStyle = color;
+            ctx.fillStyle = fill;
             ctx.fillRect(this.x, this.y, this.width, this.height);
 
         }};
