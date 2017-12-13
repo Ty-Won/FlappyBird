@@ -12,5 +12,5 @@ body, html {
 canvas {
     width: 100%;
     height: 100%;
-    background: url("flappyBackground.png") center no-repeat;
+    background: url("Images/flappyBackground.png") center no-repeat;
 }

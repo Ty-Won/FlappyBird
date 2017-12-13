@@ -1,13 +1,13 @@
 var flappyBird;
 var myScore;
 var pillars = [];
-var flapAudio = new Audio('Sounds/sfx_swooshing.wav');
+var flapAudio = new Audio('Sounds/sfx_wing.wav');
 var hit = new Audio ('Sounds/sfx_hit.wav');
 var gameOverAud = new Audio('Sounds/sfx_die.wav');
 
 
 function startGame() {
-    flappyBird = new component(60, 40, "Flappy_Bird.png", 250, window.innerHeight / 2, "img");
+    flappyBird = new component(60, 40, "Images/FlapMid.png", 250, window.innerHeight / 2, "img");
     myScore = new component("30px", "Consolas", "black", 280, 40, "text");
     myGameArea.start();
 }
@@ -25,10 +25,11 @@ var myGameArea = {
             myGameArea.keys = (myGameArea.keys || []);
             myGameArea.keys[e.keyCode] = (e.type == "keydown");
 
+
         });
 
         window.addEventListener('keyup', function (e) {
-            myGameArea.keys[e.keyCode] = (e.type == "keydown");
+            myGameArea.keys[e.keyCode] = (e.type === "keydown");
         });
     },
     clear: function () {
@@ -47,11 +48,14 @@ function updateGameArea() {
             myGameArea.stop();
             hit.play();
             gameOverAud.play();
-            alert("GAME OVER");
+            if(confirm("Play Again?")){
+                pillars=[];
+                startGame();
+            }
 
         }
 
-        else if(pillars[0].x<0 ){
+        else if(pillars[0].x<-200 ){
             pillars.shift();
 
 
@@ -62,30 +66,42 @@ function updateGameArea() {
     myGameArea.clear();
 
     myGameArea.frameNo += 1;
-    if (myGameArea.frameNo == 1 || everyInterval(150)) {
+    if (myGameArea.frameNo === 1 || everyInterval(150)) {
         x = myGameArea.canvas.width;
         minHeight=0;
         maxHeight = 200;
         height= Math.floor(Math.random()*(maxHeight-minHeight+1)+minHeight);
-        minGap = 75;
-        maxGap=200;
+        minGap = 125;
+        maxGap=250;
         gap = Math.floor(Math.random()*(maxGap-minGap)+minGap);
         y = myGameArea.canvas.height - 200;
-        pillars.push(new component(50, height, "pipeDown.png", x, 0,"img"));
-        pillars.push(new component(50, x-height-gap, "pipeDown.png", x, height+gap,"img"));
+        pillars.push(new component(50, height, "Images/pipeDown.png", x, 0,"img"));
+        pillars.push(new component(50, x-height-gap, "Images/pipeDown.png", x, height+gap,"img"));
+
     }
 
-    for (i = 0; i < pillars.length; i += 1) {
+    if (myGameArea.frameNo % 30 === 0){
+        flappyBird.image.src="Images/FlapDown.png"
+    }
+    else if (myGameArea.frameNo % 20 === 0){
+        flappyBird.image.src="Images/FlapMid.png"
+    }
+    else if (myGameArea.frameNo % 10 === 0){
+        flappyBird.image.src="Images/FlapUp.png"
+    }
+
+
+    for (var i = 0; i < pillars.length; i += 1) {
         pillars[i].x += -2;
         pillars[i].update();
     }
 
     flappyBird.speedX = 0;
     flappyBird.speedY = 0;
-    flappyBird.gravity=3;
+    flappyBird.gravity=0.35;
 
     if (myGameArea.keys && myGameArea.keys[38]) {
-        flappyBird.gravity = -15;
+        flappyBird.gravity=-0.5;
         flapAudio.play();
         flapAudio.currentTime=0;
     }
@@ -103,7 +119,8 @@ function component(width, height, fill, x, y, type) {
     this.y = y;
     this.speedX = 0;
     this.speedY = 0;
-    this.gravity=0;
+    this.gravity=0.01;
+    this.gravitySpeed=0;
     this.type=type;
     if(this.type === "img"){
         this.image = new Image();
@@ -121,8 +138,6 @@ function component(width, height, fill, x, y, type) {
         }
         else if(this.type === "img"){
             ctx.drawImage(this.image, this.x,this.y,this.width,this.height);
-
-
         }
         else
         {
@@ -131,8 +146,9 @@ function component(width, height, fill, x, y, type) {
 
         }};
     this.newPos = function () {
+        this.gravitySpeed += this.gravity;
         this.x += this.speedX;
-        this.y += this.speedY+this.gravity;
+        this.y += this.speedY+this.gravitySpeed;
     };
     this.crashWith = function (otherobj) {
         var objLeft = this.x;
@@ -158,12 +174,9 @@ function component(width, height, fill, x, y, type) {
 }
 
 function everyInterval(n) {
-    return ((myGameArea.frameNo / n) % 1 === 0);
+    return ((myGameArea.frameNo) % n === 0);
 }
 
-function accelerate(n){
-    flappyBird.gravity=n;
-}
 
 
 
