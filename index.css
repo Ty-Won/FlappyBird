@@ -1,16 +1,42 @@
-canvas {
-    border: solid 1px black;
+@font-face {
+    font-family: 'flappy-font';
+    src: url("Font/Munro.ttf");
 }
 
-body, html {
+.opening-menu{
+    display: block;
+    text-align: center;
+
+}
+
+
+.opening-title {
+    font-family: flappy-font;
+    color: white;
+    font-size: 6em;
+}
+
+
+body{
     width: 100%;
     height: 100%;
     margin: 0;
     padding: 0;
     overflow: hidden;
+    background: url("Images/flappyBackground.png") center no-repeat;
+    -webkit-transition: 3s;
+    -moz-transition:  3s;
+    -ms-transition:  3s;
+    -o-transition:  3s;
+    transition:  3s;
 }
+
 canvas {
     width: 100%;
     height: 100%;
-    background: url("Images/flappyBackground.png") center no-repeat;
+
 }
+
+
+
+
