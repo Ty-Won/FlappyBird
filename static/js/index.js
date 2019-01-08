@@ -1,13 +1,21 @@
 var flappyBird;
 var myScore;
 var pillars = [];
-var flapAudio = new Audio('Sounds/sfx_wing.wav');
-var hit = new Audio('Sounds/sfx_hit.wav');
-var gameOverAud = new Audio('Sounds/sfx_die.wav');
+var flapAudio = new Audio('static/Sounds/sfx_wing.wav');
+var hit = new Audio('static/Sounds/sfx_hit.wav');
+var gameOverAud = new Audio('static/Sounds/sfx_die.wav');
 
-
+/**
+ * The myGameArea object is used to create the game canvas and is responsible for all the rendering
+ * of the game visuals.
+ *
+ * @type {{canvas: HTMLCanvasElement | HTMLCanvasElement, render: myGameArea.render, clear: myGameArea.clear, stop: myGameArea.stop}}
+ */
 var myGameArea = {
+
     canvas: document.createElement("canvas"),
+
+
     render: function () {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
@@ -21,92 +29,25 @@ var myGameArea = {
 
 
         });
-
+        
         window.addEventListener('keyup', function (e) {
             myGameArea.keys[e.keyCode] = (e.type === "keydown");
         });
     },
+    
     clear: function () {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     },
+
     stop: function () {
         clearInterval(this.interval);
     }
 };
 
 
-// function updateGameArea() {
-//     var x, y;
-//
-//     for (i = 0; i < pillars.length; i++) {
-//         if (flappyBird.crashWith(pillars[i]) || flappyBird.x <0 || flappyBird.y > window.innerHeight) {
-//             myGameArea.stop();
-//             hit.play();
-//             gameOverAud.play();
-//             if(confirm("Play Again?")){
-//                 pillars=[];
-//                 startGame();
-//             }
-//
-//         }
-//
-//         else if(pillars[0].x<-200 ){
-//             pillars.shift();
-//
-//
-//         }
-//     }
-//
-//
-//     myGameArea.clear();
-//
-//     myGameArea.frameNo += 1;
-//     if (myGameArea.frameNo === 1 || everyInterval(150)) {
-//         x = myGameArea.canvas.width;
-//         minHeight=0;
-//         maxHeight = 200;
-//         height= Math.floor(Math.random()*(maxHeight-minHeight+1)+minHeight);
-//         minGap = 125;
-//         maxGap=250;
-//         gap = Math.floor(Math.random()*(maxGap-minGap)+minGap);
-//         y = myGameArea.canvas.height - 200;
-//         pillars.push(new Component(50, height, "Images/pipeDown.png", x, 0,"img"));
-//         pillars.push(new Component(50, y, "Images/pipeUp.png", x, height+gap,"img"));
-//
-//     }
-//
-//     if (myGameArea.frameNo % 30 === 0){
-//         flappyBird.image.src="Images/FlapDown.png"
-//     }
-//     else if (myGameArea.frameNo % 20 === 0){
-//         flappyBird.image.src="Images/FlapMid.png"
-//     }
-//     else if (myGameArea.frameNo % 10 === 0){
-//         flappyBird.image.src="Images/FlapUp.png"
-//     }
-//
-//
-//     for (var i = 0; i < pillars.length; i += 1) {
-//         pillars[i].x += -4;
-//         pillars[i].update();
-//     }
-//
-//     flappyBird.speedX = 0;
-//     flappyBird.speedY = 0;
-//     flappyBird.gravity=0.35;
-//
-//     if (myGameArea.keys && myGameArea.keys[38]) {
-//         flappyBird.gravity=-0.5;
-//         flapAudio.play();
-//         flapAudio.currentTime=0;
-//     }
-//     myScore.text="Score:" + myGameArea.frameNo;
-//     myScore.update();
-//     flappyBird.newPos();
-//     flappyBird.update();
-//
-// } COPY OF MYGAMEAREA
-
+/**
+ * The updateGameArea function
+ */
 function updateGameArea() {
     var x;
     var minHeight = 0;
@@ -130,8 +71,8 @@ function updateGameArea() {
     myGameArea.frameNo += 1;
     if (everyInterval(125)) {
         x = myGameArea.canvas.width;
-        pillars.push(new Component(50, height, "Images/pipeDown.png", x, 0, "img"));
-        pillars.push(new Component(50, x - height - gap, "Images/pipeDown.png", x, height + gap, "img"));
+        pillars.push(new Component(50, height, "static/Images/pipeDown.png", x, 0, "img"));
+        pillars.push(new Component(50, x - height - gap, "static/Images/pipeDown.png", x, height + gap, "img"));
 
     }
 
@@ -164,6 +105,10 @@ function updateGameArea() {
 
 }
 
+/**
+ * The renderFlappy function is responsible for the initial game start rendering of the flappy bird
+ * and the animation. Upon start, this function will call upon updateGameArea to generate the pillars
+ */
 function renderFlappy() {
 
     myGameArea.clear();
@@ -171,13 +116,13 @@ function renderFlappy() {
     myGameArea.frameNo += 1;
     flappyBird.gravity = 0;
     if (myGameArea.frameNo % 35 === 0) {
-        flappyBird.image.src = "Images/FlapDown.png"
+        flappyBird.image.src = "static/Images/FlapDown.png"
     }
     else if (myGameArea.frameNo % 15 === 0) {
-        flappyBird.image.src = "Images/FlapMid.png"
+        flappyBird.image.src = "static/Images/FlapMid.png"
     }
     else if (myGameArea.frameNo % 5 === 0) {
-        flappyBird.image.src = "Images/FlapUp.png"
+        flappyBird.image.src = "static/Images/FlapUp.png"
     }
 
 
@@ -200,6 +145,17 @@ function renderFlappy() {
 
 }
 
+/**
+ * The Component constructor is responsible for generating objects within the canvas.
+ *
+ * @param width
+ * @param height
+ * @param fill - determines the display content of the component
+ * @param x - initial x position of the component following the x axis of an html page
+ * @param y - initial y position of the component following the x axis of an html page
+ * @param type - specifies the type of component to be generated, bird, score, pipe etc
+ * @constructor
+ */
 function Component(width, height, fill, x, y, type) {
     this.width = width;
     this.height = height;
@@ -216,6 +172,10 @@ function Component(width, height, fill, x, y, type) {
 
     }
 
+
+    /**
+     * 
+     */
     this.update = function () {
         ctx = myGameArea.context;
         if (this.type === "text") {
@@ -233,11 +193,22 @@ function Component(width, height, fill, x, y, type) {
 
         }
     };
+
+    /**
+     *
+     */
     this.newPos = function () {
         this.gravitySpeed += this.gravity;
         this.x += this.speedX;
         this.y += this.speedY + this.gravitySpeed;
     };
+
+
+    /**
+     *
+     * @param otherobj
+     * @returns {boolean}
+     */
     this.crashWith = function (otherobj) {
         var objLeft = this.x;
         var objright = this.x + this.width;
@@ -268,7 +239,7 @@ function everyInterval(n) {
 
 
 function startGame() {
-    flappyBird = new Component(60, 40, "Images/FlapMid.png", 250, window.innerHeight / 2, "img");
+    flappyBird = new Component(60, 40, "static/Images/FlapMid.png", 250, window.innerHeight / 2, "img");
     flappyBird.begin = false;
     flappyBird.ignore = true;
     myScore = new Component("30px", "Consolas", "black", 280, 40, "text");

@@ -23,7 +23,7 @@ body{
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background: url("Images/flappyBackground.png") center no-repeat;
+    background: url("../Images/flappyBackground.png") center no-repeat;
     -webkit-transition: 3s;
     -moz-transition:  3s;
     -ms-transition:  3s;
